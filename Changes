@@ -1,3 +1,6 @@
+2.59 Thurs March 23 2023
+- Remove meaningless const type qualifier to silence HPUX builds.
+
 2.58 Mon Oct 5 2020
 - Update repo location.
 - Update recent changelog entries. Let's see if that's enough to make metacpan happy.
