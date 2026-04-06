@@ -13,6 +13,7 @@ t/align.t			Try unaligned memory blocks
 t/badfile.t			Try addfile() on unopened file
 t/bits.t			Try add_bits method
 t/clone.t			Try clone() method.
+t/fips.t			FIPS mode detection
 t/files.t			Check a few files.
 t/md5-aaa.t			Exercise padding code
 t/threads.t			Test if threads confuse things
