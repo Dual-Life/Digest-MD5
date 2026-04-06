@@ -15,6 +15,7 @@ t/bits.t			Try add_bits method
 t/clone.t			Try clone() method.
 t/files.t			Check a few files.
 t/md5-aaa.t			Exercise padding code
+t/methods.t			Method coverage and edge cases
 t/threads.t			Test if threads confuse things
 t/utf8.t			Try some Unicode strings
 t/warns.t
