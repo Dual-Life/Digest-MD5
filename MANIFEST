@@ -17,5 +17,5 @@ t/files.t			Check a few files.
 t/md5-aaa.t			Exercise padding code
 t/threads.t			Test if threads confuse things
 t/utf8.t			Try some Unicode strings
-t/warns.t
+t/warns.t			Test warning messages for misuse
 typemap				Supplementary typemap
