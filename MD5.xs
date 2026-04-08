@@ -699,6 +699,8 @@ context(ctx, ...)
 	    STRLEN len;
 	    unsigned long blocks = SvUV(ST(1));
 	    unsigned char *buf = (unsigned char *)(SvPV(ST(2), len));
+	    if (len < 16)
+		croak("Digest::MD5 context state must be exactly 16 bytes, got %"UVuf, (UV)len);
 	    ctx->A = buf[ 0] | (buf[ 1]<<8) | (buf[ 2]<<16) | (buf[ 3]<<24);
 	    ctx->B = buf[ 4] | (buf[ 5]<<8) | (buf[ 6]<<16) | (buf[ 7]<<24);
 	    ctx->C = buf[ 8] | (buf[ 9]<<8) | (buf[10]<<16) | (buf[11]<<24);
@@ -707,6 +709,8 @@ context(ctx, ...)
 	    ctx->bytes_high = blocks >> 26;
 	    if (items == 4) {
 		buf = (unsigned char *)(SvPV(ST(3), len));
+		if (len > 63)
+		    croak("Digest::MD5 context data must be at most 63 bytes, got %"UVuf, (UV)len);
 		MD5Update(ctx, buf, len);
 	    }
 	    XSRETURN(1); /* ctx */

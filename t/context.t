@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 35;
+use Test::More tests => 37;
 use Digest::MD5;
 
 foreach my $length (
@@ -41,3 +41,11 @@ foreach my $length (
 
     is $got, $expect, "[$length] saved context";
 }
+
+# Validate that context() croaks on short state buffer
+eval { Digest::MD5->new->context(0, "short") };
+like $@, qr/must be exactly 16 bytes/, "context() croaks on short state buffer";
+
+# Validate that context() croaks on overlong unprocessed data
+eval { Digest::MD5->new->context(0, "\0" x 16, "x" x 64) };
+like $@, qr/must be at most 63 bytes/, "context() croaks on overlong data buffer";
