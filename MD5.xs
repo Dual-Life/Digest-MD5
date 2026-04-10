@@ -45,6 +45,10 @@
 # define PERL_MAGIC_ext '~'
 #endif
 
+#ifndef Newx
+# define Newx(v,n,t) New(0,v,n,t)
+#endif
+
 #ifndef Newxz
 # define Newxz(v,n,t) Newz(0,v,n,t)
 #endif
@@ -127,7 +131,7 @@ STATIC int dup_md5_ctx(pTHX_ MAGIC *mg, CLONE_PARAMS *params)
 {
     MD5_CTX *new_ctx;
     PERL_UNUSED_VAR(params);
-    New(55, new_ctx, 1, MD5_CTX);
+    Newx(new_ctx, 1, MD5_CTX);
     memcpy(new_ctx, mg->mg_ptr, sizeof(MD5_CTX));
     mg->mg_ptr = (char *)new_ctx;
     return 0;
@@ -582,7 +586,7 @@ new(xclass)
 	if (!SvROK(xclass)) {
 	    STRLEN my_na;
 	    const char *sclass = SvPV(xclass, my_na);
-	    New(55, context, 1, MD5_CTX);
+	    Newx(context, 1, MD5_CTX);
 	    ST(0) = sv_2mortal(new_md5_ctx(aTHX_ context, sclass));
 	} else {
 	    context = get_md5_ctx(aTHX_ xclass);
@@ -598,7 +602,7 @@ clone(self)
 	const char *myname = sv_reftype(SvRV(self),TRUE);
 	MD5_CTX* context;
     PPCODE:
-	New(55, context, 1, MD5_CTX);
+	Newx(context, 1, MD5_CTX);
 	ST(0) = sv_2mortal(new_md5_ctx(aTHX_ context, myname));
 	memcpy(context,cont,sizeof(MD5_CTX));
 	XSRETURN(1);
