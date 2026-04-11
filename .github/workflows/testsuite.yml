@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: perl -V
       - name: install dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@stable
         with:
           cpanfile: "cpanfile"
       - name: Makefile.PL
@@ -35,9 +35,7 @@ jobs:
     needs: [ubuntu]
     env:
       PERL_USE_UNSAFE_INC: 0
-      AUTHOR_TESTING: 1
       AUTOMATED_TESTING: 1
-      RELEASE_TESTING: 1
 
     runs-on: ubuntu-latest
 
@@ -46,6 +44,10 @@ jobs:
       matrix:
         perl-version:
           [
+            "5.40",
+            "5.38",
+            "5.36",
+            "5.34",
             "5.32",
             "5.30",
             "5.28",
@@ -58,22 +60,19 @@ jobs:
             "5.14",
             "5.12",
             "5.10",
-            "5.8",
           ]
 
-    container:
-      image: perl:${{ matrix.perl-version }}
-
     steps:
-      - uses: actions/checkout@v2
-      - run: perl -V
-      - name: install dependencies
-        uses: perl-actions/install-with-cpm@v1
+      - uses: actions/checkout@v4
+      - name: Set up perl ${{ matrix.perl-version }}
+        uses: shogo82148/actions-setup-perl@v1
         with:
-          sudo: false
-          cpanfile: "cpanfile"
+          perl-version: ${{ matrix.perl-version }}
+      - run: perl -V
       - name: Makefile.PL
         run: perl -I$(pwd) Makefile.PL
+      - name: make
+        run: make
       - name: make test
         run: make test
 
@@ -81,25 +80,40 @@ jobs:
     needs: [ubuntu]
     env:
       PERL_USE_UNSAFE_INC: 0
-      AUTHOR_TESTING: 1
       AUTOMATED_TESTING: 1
-      RELEASE_TESTING: 1
 
     runs-on: macOS-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        perl-version: [latest]
-
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: perl -V
       - name: install dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@stable
         with:
           cpanfile: "cpanfile"
       - name: Makefile.PL
         run: perl -I$(pwd) Makefile.PL
       - name: make test
         run: make test
+
+  windows:
+    needs: [ubuntu]
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTOMATED_TESTING: 1
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Strawberry Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: "5.38"
+      - run: perl -V
+      - name: Makefile.PL
+        run: perl Makefile.PL
+      - name: make
+        run: gmake
+      - name: make test
+        run: gmake test
