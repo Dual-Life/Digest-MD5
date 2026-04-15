@@ -22,6 +22,14 @@ sub run_perl_script {
     return ($?, $out);
 }
 
+# Escape backslashes for safe interpolation into double-quoted strings
+# (Windows paths like C:\Users\... would otherwise be mangled by \U, \f, etc.)
+sub escape_path {
+    my ($path) = @_;
+    $path =~ s/\\/\\\\/g;
+    return $path;
+}
+
 # Test 1: When FIPS file contains "1", loading Digest::MD5 should croak
 {
     my $dir = tempdir(CLEANUP => 1);
@@ -30,8 +38,9 @@ sub run_perl_script {
     print $fh "1\n";
     close $fh;
 
+    my $safe_path = escape_path($fips_file);
     my ($status, $out) = run_perl_script(<<"EOT");
-\$ENV{DIGEST_MD5_FIPS_FILE} = "$fips_file";
+\$ENV{DIGEST_MD5_FIPS_FILE} = "$safe_path";
 eval { require Digest::MD5 };
 if (\$\@ =~ /FIPS/) { print "FIPS_CROAK\\n"; exit 0 }
 else { print "NO_CROAK: \$\@\\n"; exit 1 }
@@ -48,8 +57,9 @@ EOT
     print $fh "0\n";
     close $fh;
 
+    my $safe_path = escape_path($fips_file);
     my ($status, $out) = run_perl_script(<<"EOT");
-\$ENV{DIGEST_MD5_FIPS_FILE} = "$fips_file";
+\$ENV{DIGEST_MD5_FIPS_FILE} = "$safe_path";
 eval { require Digest::MD5 };
 if (\$\@) { print "CROAK: \$\@\\n"; exit 1 }
 else { print "OK\\n"; exit 0 }
@@ -63,8 +73,9 @@ EOT
     my $dir = tempdir(CLEANUP => 1);
     my $fips_file = File::Spec->catfile($dir, "no_such_file");
 
+    my $safe_path = escape_path($fips_file);
     my ($status, $out) = run_perl_script(<<"EOT");
-\$ENV{DIGEST_MD5_FIPS_FILE} = "$fips_file";
+\$ENV{DIGEST_MD5_FIPS_FILE} = "$safe_path";
 eval { require Digest::MD5 };
 if (\$\@) { print "CROAK: \$\@\\n"; exit 1 }
 else { print "OK\\n"; exit 0 }
@@ -81,8 +92,9 @@ EOT
     print $fh "1\n";
     close $fh;
 
+    my $safe_path = escape_path($fips_file);
     my ($status, $out) = run_perl_script(<<"EOT");
-\$ENV{DIGEST_MD5_FIPS_FILE} = "$fips_file";
+\$ENV{DIGEST_MD5_FIPS_FILE} = "$safe_path";
 eval { require Digest::MD5 };
 print \$\@;
 EOT
