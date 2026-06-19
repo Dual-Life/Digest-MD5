@@ -33,8 +33,8 @@ WriteMakefile(
     'META_MERGE'   => {
         resources  => {
             license    => 'http://dev.perl.org/licenses/',
-            bugtracker => 'https://github.com/Dual-Life/digest-md5/issues',
-            repository => 'https://github.com/dual-Life/digest-md5/',
+            bugtracker => 'https://github.com/Dual-Life/Digest-MD5/issues',
+            repository => 'https://github.com/Dual-Life/Digest-MD5',
         }
     },
     @extra,
