@@ -146,16 +146,7 @@ STATIC const MGVTBL vtbl_md5 = {
     NULL /* local */
 };
 #else
-/* declare as 5 member, not normal 8 to save image space*/
-STATIC const struct {
-	int (*svt_get)(SV* sv, MAGIC* mg);
-	int (*svt_set)(SV* sv, MAGIC* mg);
-	U32 (*svt_len)(SV* sv, MAGIC* mg);
-	int (*svt_clear)(SV* sv, MAGIC* mg);
-	int (*svt_free)(SV* sv, MAGIC* mg);
-} vtbl_md5 = {
-	NULL, NULL, NULL, NULL, NULL
-};
+STATIC const MGVTBL vtbl_md5 = {0};
 #endif
 
 
@@ -697,7 +688,7 @@ context(ctx, ...)
     PPCODE:
 	if (items > 2) {
 	    STRLEN len;
-	    unsigned long blocks = SvUV(ST(1));
+	    UV blocks = SvUV(ST(1));
 	    unsigned char *buf = (unsigned char *)(SvPV(ST(2), len));
 	    ctx->A = buf[ 0] | (buf[ 1]<<8) | (buf[ 2]<<16) | (buf[ 3]<<24);
 	    ctx->B = buf[ 4] | (buf[ 5]<<8) | (buf[ 6]<<16) | (buf[ 7]<<24);
@@ -720,7 +711,7 @@ context(ctx, ...)
         w=ctx->D; out[12]=(char)w; out[13]=(char)(w>>8); out[14]=(char)(w>>16); out[15]=(char)(w>>24);
 
 	EXTEND(SP, 3);
-	ST(0) = sv_2mortal(newSVuv(ctx->bytes_high << 26 |
+	ST(0) = sv_2mortal(newSVuv((UV)ctx->bytes_high << 26 |
 				   ctx->bytes_low >> 6));
 	ST(1) = sv_2mortal(newSVpv(out, 16));
 
