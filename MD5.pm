@@ -5,6 +5,19 @@ use warnings;
 
 our $VERSION = '2.59';
 
+# Check for FIPS mode - MD5 is not available when system is in FIPS mode
+{
+    my $fips_file = $ENV{DIGEST_MD5_FIPS_FILE} || '/proc/sys/crypto/fips_enabled';
+    if (open my $fh, '<', $fips_file) {
+        my $enabled = <$fh>;
+        close $fh;
+        if (defined $enabled && $enabled =~ /^1/) {
+            require Carp;
+            Carp::croak("Digest::MD5: MD5 is disabled because the system is running in FIPS mode");
+        }
+    }
+}
+
 require Exporter;
 *import = \&Exporter::import;
 our @EXPORT_OK = qw(md5 md5_hex md5_base64);
@@ -87,6 +100,18 @@ a message.
 The C<Digest::MD5> module provide a procedural interface for simple
 use, as well as an object oriented interface that can handle messages
 of arbitrary length and which can read files directly.
+
+=head2 FIPS mode
+
+On systems running in FIPS mode (Federal Information Processing
+Standards), the MD5 algorithm is considered insecure and is not
+permitted for cryptographic use.  If the system has FIPS mode enabled
+(as indicated by F</proc/sys/crypto/fips_enabled> on Linux), this
+module will croak at load time with an appropriate error message.
+
+You can override the path to the FIPS check file by setting the
+C<DIGEST_MD5_FIPS_FILE> environment variable.  This is primarily
+intended for testing.
 
 =head1 FUNCTIONS
 
