@@ -22,7 +22,7 @@ EOT
     # This is the output of: 'md5sum README MD5.xs rfc1321.txt'
     $EXPECT = <<EOT;
 2f93400875dbb56f36691d5f69f3eba5  README
-a141e2845a675e3e7a00f24f071e84cf  MD5.xs
+419e34ec10712027b2b0fe42aa103f69  MD5.xs
 754b9db19f79dbc4992f7166eb0f37ce  rfc1321.txt
 EOT
 }

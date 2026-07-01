@@ -654,8 +654,12 @@ addfile(self, fh)
 	        STRLEN missing = 64 - fill;
 	        if ( (n = PerlIO_read(fh, buffer, missing)) > 0)
 	 	    MD5Update(context, buffer, n);
-	        else
+	        else {
+#ifdef USE_HEAP_INSTEAD_OF_STACK
+		    Safefree(buffer);
+#endif
 		    XSRETURN(1);  /* self */
+		}
 	    }
 
 	    /* Process blocks until EOF or error */
