@@ -633,16 +633,17 @@ addfile(self, fh)
     PREINIT:
 	MD5_CTX* context = get_md5_ctx(aTHX_ self);
 	STRLEN fill = context->bytes_low & 0x3F;
+#define BUFFER_SIZE 4096
 #ifdef USE_HEAP_INSTEAD_OF_STACK
 	unsigned char* buffer;
 #else
-	unsigned char buffer[4096];
+	unsigned char buffer[BUFFER_SIZE];
 #endif
 	int  n;
     CODE:
 	if (fh) {
 #ifdef USE_HEAP_INSTEAD_OF_STACK
-	    New(0, buffer, 4096, unsigned char);
+	    New(0, buffer, BUFFER_SIZE, unsigned char);
 	    assert(buffer);
 #endif
             if (fill) {
@@ -653,12 +654,16 @@ addfile(self, fh)
 	        STRLEN missing = 64 - fill;
 	        if ( (n = PerlIO_read(fh, buffer, missing)) > 0)
 	 	    MD5Update(context, buffer, n);
-	        else
+	        else {
+#ifdef USE_HEAP_INSTEAD_OF_STACK
+		    Safefree(buffer);
+#endif
 		    XSRETURN(1);  /* self */
+		}
 	    }
 
 	    /* Process blocks until EOF or error */
-            while ( (n = PerlIO_read(fh, buffer, sizeof(buffer))) > 0) {
+            while ( (n = PerlIO_read(fh, buffer, BUFFER_SIZE)) > 0) {
 	        MD5Update(context, buffer, n);
 	    }
 #ifdef USE_HEAP_INSTEAD_OF_STACK
@@ -699,10 +704,10 @@ context(ctx, ...)
 	    STRLEN len;
 	    unsigned long blocks = SvUV(ST(1));
 	    unsigned char *buf = (unsigned char *)(SvPV(ST(2), len));
-	    ctx->A = buf[ 0] | (buf[ 1]<<8) | (buf[ 2]<<16) | (buf[ 3]<<24);
-	    ctx->B = buf[ 4] | (buf[ 5]<<8) | (buf[ 6]<<16) | (buf[ 7]<<24);
-	    ctx->C = buf[ 8] | (buf[ 9]<<8) | (buf[10]<<16) | (buf[11]<<24);
-	    ctx->D = buf[12] | (buf[13]<<8) | (buf[14]<<16) | (buf[15]<<24);
+	    ctx->A = (U32)buf[ 0] | ((U32)buf[ 1]<<8) | ((U32)buf[ 2]<<16) | ((U32)buf[ 3]<<24);
+	    ctx->B = (U32)buf[ 4] | ((U32)buf[ 5]<<8) | ((U32)buf[ 6]<<16) | ((U32)buf[ 7]<<24);
+	    ctx->C = (U32)buf[ 8] | ((U32)buf[ 9]<<8) | ((U32)buf[10]<<16) | ((U32)buf[11]<<24);
+	    ctx->D = (U32)buf[12] | ((U32)buf[13]<<8) | ((U32)buf[14]<<16) | ((U32)buf[15]<<24);
 	    ctx->bytes_low = blocks << 6;
 	    ctx->bytes_high = blocks >> 26;
 	    if (items == 4) {
