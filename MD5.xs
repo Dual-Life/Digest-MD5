@@ -273,13 +273,13 @@ MD5Transform(MD5_CTX* ctx, const U8* buf, STRLEN blocks)
 	if (buf == ctx->buffer)
 	    fprintf(stderr,"%5d: Transform ctx->buffer", ++tcount);
 	else 
-	    fprintf(stderr,"%5d: Transform %p (%d)", ++tcount, buf, blocks);
+	    fprintf(stderr,"%5d: Transform %p (%d)", ++tcount, buf, (int)blocks);
 
 	{
 	    int i;
 	    fprintf(stderr,"[");
 	    for (i = 0; i < 16; i++) {
-		fprintf(stderr,"%x,", x[i]); /* FIXME */
+		fprintf(stderr,"%x,", X[i]);
 	    }
 	    fprintf(stderr,"]\n");
 	}
@@ -392,7 +392,7 @@ MD5Update(MD5_CTX* ctx, const U8* buf, STRLEN len)
 #ifdef MD5_DEBUG  
     static int ucount = 0;
     fprintf(stderr,"%5i: Update(%s, %p, %d)\n", ++ucount, ctx_dump(ctx),
-	                                        buf, len);
+	                                        buf, (int)len);
 #endif
 
     ctx->bytes_low += len;
