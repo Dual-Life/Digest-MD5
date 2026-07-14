@@ -456,7 +456,7 @@ static MD5_CTX* get_md5_ctx(pTHX_ SV* sv)
 {
     MAGIC *mg;
 
-    if (!sv_derived_from(sv, "Digest::MD5"))
+    if (!SvROK(sv) || !sv_derived_from(sv, "Digest::MD5"))
 	croak("Not a reference to a Digest::MD5 object");
 
     for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
