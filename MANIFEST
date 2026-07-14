@@ -11,6 +11,7 @@ README				Guess what?
 rfc1321.txt			The MD5 Message-Digest Algorithm
 t/align.t			Try unaligned memory blocks
 t/badfile.t			Try addfile() on unopened file
+t/badobj.t			Croak on bareword class, not segfault
 t/bits.t			Try add_bits method
 t/clone.t			Try clone() method.
 t/files.t			Check a few files.
