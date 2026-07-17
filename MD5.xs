@@ -395,9 +395,16 @@ MD5Update(MD5_CTX* ctx, const U8* buf, STRLEN len)
 	                                        buf, len);
 #endif
 
-    ctx->bytes_low += len;
-    if (ctx->bytes_low < len) /* wrap around */
-	ctx->bytes_high++;
+    {
+	U32 old_bytes_low = ctx->bytes_low;
+	ctx->bytes_low += (U32)len;
+	TRUNC32(ctx->bytes_low);
+	if (ctx->bytes_low < old_bytes_low) /* carry from low add */
+	    ctx->bytes_high++;
+	/* If STRLEN is wider than 32 bits, add the high bits of len */
+	if (sizeof(STRLEN) > 4)
+	    ctx->bytes_high += (U32)((STRLEN)len >> 32);
+    }
 
     if (fill) {
 	STRLEN missing = 64 - fill;
